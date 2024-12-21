@@ -169,3 +169,6 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+# for some reason this is a file that is generated with setup.py install
+1q
