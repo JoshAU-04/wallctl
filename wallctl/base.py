@@ -58,8 +58,7 @@ def download_image(url: str, filepath: str):
                 file.write(chunk)
                 progress_bar.update(len(chunk))
     except requests.RequestException as err:
-        logging.error(f"Failed to download {url}: {err}")
-        raise err
+        logging.exception(f"Failed to download {url}: {err}")
 
 
 def process_page(url: str, index: int):
@@ -82,6 +81,5 @@ def download_rand():
             process_page(page_url, index)
             logging.info("Done")
             logging.shutdown()
-            break
         except Exception as e:
             logging.error(f"Error processing page {page_url}: {e}")
