@@ -1,5 +1,6 @@
 import logging
 import os
+import subprocess
 from typing import Generator, Optional
 
 import requests
@@ -13,7 +14,7 @@ URL_RAND = "/random-wallpapers"
 
 DEFAULT_PATH = "~/Pictures/Wallpapers"
 
-__all__ = ["download_rand"]
+__all__ = ["download_rand", "apply_wallpaper"]
 
 
 def fetch_html(url: str) -> BeautifulSoup:
@@ -114,3 +115,34 @@ def download_rand() -> None:
             logging.shutdown()
         except Exception as e:
             logging.error(f"Error processing page {page_url}: {e}")
+
+
+def apply_wallpaper(wallpaper: str, binary: Optional[str]) -> None:
+    """Apply a wallpaper.
+
+    Note that this applies to all monitors.
+
+    This assumes that a wallpaper utility is set, such as:
+
+     - xwallpaper
+     - feh
+     - wal?
+
+    :param wallpaper: The wallpaper path to apply. (absolute path.)
+    :param binary: The utility to set the wallpaper with.
+    :raises FileNotFoundError: If the path doesn't exist.
+    """
+
+    if os.path.isfile(wallpaper) is not True:
+        logging.exception("Cannot find {}", wallpaper)
+
+    valid_binaries = ["feh", "xwallpaper"]
+
+    # when specified this makes my job a lot easier
+    if binary not in valid_binaries:
+        logging.exception("Invalid binary: {}", binary)
+
+    if binary == "feh":
+        subprocess.run(["feh", "--bg-scale", "--no-fehbg", wallpaper])
+    else:
+        logging.exception("still need to implement this.")
