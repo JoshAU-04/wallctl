@@ -82,35 +82,93 @@ def download_image(url: str, filepath: str) -> None:
         logging.exception(f"Failed to download {url}: {err}")
 
 
-def process_page(url: str, index: Optional[int]) -> None:
+def process_page(url: str, index: Optional[int], path: Optional[str]) -> None:
     """Process a single page and download the corresponding image.
 
     :param url: The URL of the page to process. Important: Must be a *page*
         URL.
     :param index: This is an optional value used purely for sorting purposes.
+    :param path: The path to download the wallpapers to. (default: ~/Pictures/Wallpapers)
     """
     soup = fetch_html(url)
     postfix, href = extract_image_metadata(soup)
     image_url = URL_BASE + href
-    filepath = os.path.join(
-        os.getcwd(), f"{index if index is not None else 'NA'}-{postfix}.jpg"
-    )
+    image_name = f"{index if index is not None else 'NA'}-{postfix}.jpg"
+    if path is None:
+        filepath = os.path.join(os.path.expanduser(DEFAULT_PATH), image_name)
+    else:
+        filepath = os.path.join(
+            os.getcwd(), f"{index if index is not None else 'NA'}-{postfix}.jpg"
+        )
     download_image(image_url, filepath)
 
 
-def download_rand() -> None:
+def download_rand(path: str) -> None:
     """Download a random wallpaper from 4kwallpapers.com
 
-    This function creates `DEFAULT_PATH`. This should be noted before calling.
+    :param path: The path to download the wallpapers to.
+    :returns: None
     """
-
-    os.makedirs(os.path.expanduser(DEFAULT_PATH), exist_ok=True)
-    os.chdir(os.path.expanduser(DEFAULT_PATH))
 
     for index, page_url in enumerate(find_pages(URL_BASE + URL_RAND)):
         try:
             logging.info(f"Processing page {page_url}")
-            process_page(page_url, index)
+            process_page(page_url, index, path)
+            logging.info("Done")
+            logging.shutdown()
+        except Exception as e:
+            logging.error(f"Error processing page {page_url}: {e}")
+
+
+def download_category(category: str, path: str) -> None:
+    """Download a wallpaper from a specific category.
+
+    :param category: The category to download from.
+    :param path: Path to download the wallpapers to.
+    """
+
+    if category not in [
+        "abstract",
+        "animals",
+        "anime",
+        "architecture",
+        "bikes",
+        "black-dark",
+        "cars",
+        "celebrities",
+        "cute",
+        "fantasy",
+        "flowers",
+        "food",
+        "games",
+        "gradients",
+        "CGI",
+        "lifestyle",
+        "love",
+        "military",
+        "minimal",
+        "movies",
+        "music",
+        "nature",
+        "people",
+        "photography",
+        "quotes",
+        "sci-fi",
+        "space",
+        "sports",
+        "technology",
+        "world",
+    ]:
+        logging.exception("Invalid category: {}", category)
+
+    url = f"{URL_BASE}/{category}"
+
+    os.makedirs(os.path.expanduser(os.path.join(path, category)), exist_ok=True)
+
+    for index, page_url in enumerate(find_pages(url)):
+        try:
+            logging.info(f"Processing page {page_url}")
+            process_page(page_url, index, path)
             logging.info("Done")
             logging.shutdown()
         except Exception as e:

@@ -1,7 +1,6 @@
-__all__ = ["main", "parse"]
+__all__ = ["main"]
 
 from wallctl.cli import main
-from wallctl.parser import parse
 
 if __name__ == "__main__":
     main()
