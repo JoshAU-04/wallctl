@@ -45,6 +45,18 @@ wallctl --help
 wallctl random
 ```
 
+### Download a wallpaper by category
+
+```bash
+wallctl category --category <category>
+```
+
+### Download a wallpaper to a specific directory
+
+```bash
+wallctl random --path <directory>
+```
+
 ## License
 
 This project is licensed under the GNU GPL (v2). Refer to the `LICENSE` file

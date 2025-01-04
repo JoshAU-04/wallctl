@@ -9,7 +9,7 @@ from setuptools import find_packages, setup
 def read(*paths, **kwargs):
     """Read the contents of a text file 'safely'.
     >>> read("wallctl", "VERSION")
-    '0.1.0'
+    '0.2.0'
     >>> read("README.md")
     ...
     """
@@ -33,7 +33,7 @@ def read_requirements(path: str):
 
 setup(
     name="wallctl",
-    version=read("wallctl", "VERSION"),
+    version="0.2.0",
     description="Wallpaper downloader",
     url="https://github.com/JoshAU-04/wallctl/",
     long_description=read("README.md"),
