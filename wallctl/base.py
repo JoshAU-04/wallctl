@@ -72,9 +72,12 @@ def download_image(url: str, filepath: str) -> None:
         response.raise_for_status()
         total_size = int(response.headers.get("content-length", 0))
 
-        with open(filepath, "wb") as file, tqdm(
-            total=total_size, unit="B", unit_scale=True, desc="Downloading"
-        ) as progress_bar:
+        with (
+            open(filepath, "wb") as file,
+            tqdm(
+                total=total_size, unit="B", unit_scale=True, desc="Downloading"
+            ) as progress_bar,
+        ):
             for chunk in response.iter_content(BLOCK_SIZE):
                 file.write(chunk)
                 progress_bar.update(len(chunk))
@@ -195,12 +198,18 @@ def apply_wallpaper(wallpaper: str, binary: Optional[str]) -> None:
         logging.exception("Cannot find {}", wallpaper)
 
     valid_binaries = ["feh", "xwallpaper"]
+    logging.debug(binary)
 
     # when specified this makes my job a lot easier
     if binary not in valid_binaries:
         logging.exception("Invalid binary: {}", binary)
 
-    if binary == "feh":
-        subprocess.run(["feh", "--bg-scale", "--no-fehbg", wallpaper])
-    else:
-        logging.exception("still need to implement this.")
+    match binary:
+        case "feh":
+            subprocess.run([binary, "--bg-scale", "--no-fehbg", wallpaper])
+        case "xwallpaper":
+            subprocess.run([binary, "--zoom", wallpaper])
+        case _:
+            logging.exception(
+                f"{binary} not supported. (Please file a bug report) (ty)"
+            )

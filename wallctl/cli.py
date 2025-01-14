@@ -2,6 +2,7 @@ import logging
 import os
 
 from wallctl.parser import Parser
+from typing import Union, Literal
 
 from .base import (
     DEFAULT_PATH,
@@ -16,24 +17,29 @@ logging.basicConfig(
 )
 
 
-def main():
-    parser = Parser()
-    args = parser.parse()
-
+def get_path(args) -> Union[Literal[""], str]:
+    path: str = ""
     if args.path:
-        path = os.path.join(
-            os.path.expanduser(args.path),
-            args.download_category if args.download_category else "",
-        )
+        path = os.path.expanduser(args.path)
         os.makedirs(path, exist_ok=True)
         os.chdir(path)
     else:
         os.makedirs(os.path.expanduser(DEFAULT_PATH), exist_ok=True)
         os.chdir(os.path.expanduser(DEFAULT_PATH))
+    return path
+
+
+def main():
+    parser = Parser()
+    args = parser.parse()
+    path = get_path(args)
+
     if args.command == "random":
-        download_rand(args.path)
+        download_rand(path)
     elif args.command == "category":
-        download_category(args.download_category, args.path)
+        if args.download_category:
+            path = os.path.join(args.download_category)
+            download_category(args.download_category, path)
     elif args.command == "apply":
         apply_wallpaper(args.image, args.binary)
     elif args.url:
